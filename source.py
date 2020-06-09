@@ -9,7 +9,6 @@ from pycbrf.toolbox import ExchangeRates
 from vk_api.longpoll import VkLongPoll
 
 token = os.environ.get("KEY")
-
 second_group = os.environ.get("second group")
 vk = vk_api.VkApi(token=token)
 longpoll = VkLongPoll(vk)
@@ -82,102 +81,106 @@ def group_check(id):
 
 # Основной цикл
 while True:
-    start_time = time.time()
-    messages = vk.method("messages.getConversations", {"offset": 0, "count": 20, "filter": "unanswered"})
+    try:
+        start_time = time.time()
+        messages = vk.method("messages.getConversations", {"offset": 0, "count": 20, "filter": "unanswered"})
 
-    if messages["count"] > 0:
-        id = messages["items"][0]["last_message"]["from_id"]
-        body = messages["items"][0]["last_message"]["text"]
-        command = body[1:].lower()
-        d = 0
-        if group_check(id):
-            d += 7
-
-        if body[0] == "/":
-            count += 1
-            if (command == "пн") or (command == "понедельник"):
-                d += 1
-
-            elif (command == "вт") or (command == "вторник"):
-                d += 2
-
-            elif (command == "ср") or (command == "среда"):
-                d += 3
-
-            elif (command == "чт") or (command == "четверг"):
-                d += 4
-
-            elif (command == "пт") or (command == "пятница"):
-                d += 5
-
-            elif (command == "сб") or (command == "суббота"):
-                d += 6
-
-            elif (command == "вс") or (command == "воскресенье "):
+        if messages["count"] > 0:
+            id = messages["items"][0]["last_message"]["from_id"]
+            body = messages["items"][0]["last_message"]["text"]
+            command = body[1:].lower()
+            d = 0
+            if group_check(id):
                 d += 7
 
-            elif (command == "с") or (command == "c") or (command == "сегодня"):
-                d = (datetime.now() + timedelta(minutes=180)).isoweekday()
-                if group_check(id):
+            if body[0] == "/":
+                count += 1
+                if (command == "пн") or (command == "понедельник"):
+                    d += 1
+
+                elif (command == "вт") or (command == "вторник"):
+                    d += 2
+
+                elif (command == "ср") or (command == "среда"):
+                    d += 3
+
+                elif (command == "чт") or (command == "четверг"):
+                    d += 4
+
+                elif (command == "пт") or (command == "пятница"):
+                    d += 5
+
+                elif (command == "сб") or (command == "суббота"):
+                    d += 6
+
+                elif (command == "вс") or (command == "воскресенье "):
                     d += 7
 
-            elif (command == "з") or (command == "завтра"):
-                d = (datetime.now() + timedelta(minutes=180)).isoweekday() + 1
-                if d > 7:
-                    d = 1
-                if group_check(id):
-                    d += 7
+                elif (command == "с") or (command == "c") or (command == "сегодня"):
+                    d = (datetime.now() + timedelta(minutes=180)).isoweekday()
+                    if group_check(id):
+                        d += 7
 
-            elif command == "сейчас":
-                answer = str(date.today()) + "\n" + "Номер дня недели: " + str(
-                    (datetime.now() + timedelta(minutes=180)).isoweekday()) + "\n" + "Неделя: " + str(parity())
-                vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
+                elif (command == "з") or (command == "завтра"):
+                    d = (datetime.now() + timedelta(minutes=180)).isoweekday() + 1
+                    if d > 7:
+                        d = 1
+                    if group_check(id):
+                        d += 7
 
-            elif command == "команды":
-                answer = {
-                    "Вот команды, которые на которые у меня есть ответ:"
-                    + "\n/сейчас – вызвать: полную дату, номер дня недели, четность и нечетность недели. "
-                    + "\n/день_недели – например «/понедельник» или «/пн»."
-                    + "\n/с или /сегодня – расписание на сегодня. "
-                    + "\n/з или /завтра – расписание на завтра."
-                    + "\n/курс - курс доллара к рублю по цб."
-                    + "\n/команды – вызвать этот текс снова."
-                }
-                vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
+                elif command == "сейчас":
+                    answer = str(date.today()) + "\n" + "Номер дня недели: " + str(
+                        (datetime.now() + timedelta(minutes=180)).isoweekday()) + "\n" + "Неделя: " + str(parity())
+                    vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
 
-            elif command == "хтоя":
-                count -= 1
-                answer = {
-                    "Твой id: " + str(id)
-                    + "\nМой id: " + str(notrandom()) + " (временно)"
-                    + "\nНомер недели: " + str(invoice_week(datetime.now() + timedelta(minutes=180)))
-                    + "\nКол. успешных запросов:   " + str(count)
-                    + "\nКол. запросов без ответа: " + str(lost)
-                    + "\nСерверное время: " + str(datetime.now())
-                    + "\nВычисленное время: " + str(datetime.now() + timedelta(minutes=180))
-                    + "\nВремя выполнения этой комманды: " + str(time.time() - start_time)}
+                elif command == "команды":
+                    answer = {
+                        "Вот команды, которые на которые у меня есть ответ:"
+                        + "\n/сейчас – вызвать: полную дату, номер дня недели, четность и нечетность недели. "
+                        + "\n/день_недели – например «/понедельник» или «/пн»."
+                        + "\n/с или /сегодня – расписание на сегодня. "
+                        + "\n/з или /завтра – расписание на завтра."
+                        + "\n/курс - курс доллара к рублю по цб."
+                        + "\n/команды – вызвать этот текс снова."
+                    }
+                    vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
 
-                vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
+                elif command == "хтоя":
+                    count -= 1
+                    answer = {
+                        "Твой id: " + str(id)
+                        + "\nМой id: " + str(notrandom()) + " (временно)"
+                        + "\nНомер недели: " + str(invoice_week(datetime.now() + timedelta(minutes=180)))
+                        + "\nКол. успешных запросов:   " + str(count)
+                        + "\nКол. запросов без ответа: " + str(lost)
+                        + "\nСерверное время: " + str(datetime.now())
+                        + "\nВычисленное время: " + str(datetime.now() + timedelta(minutes=180))
+                        + "\nВремя выполнения этой комманды: " + str(time.time() - start_time)}
 
-            elif command == "курс":
-                value = course()
-                answer = "1 $ = " + str(value['USD']) + " ₽\n"
-                answer += "1 $ = " + str(value['EUR']) + " €\n"
-                answer += "1 $ = " + str(value['UAH']) + " ₴\n"
-                vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
+                    vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
 
-            else:
-                count -= 1
-                lost += 1
-                vk.method("messages.send", {"peer_id": id,
-                                            "message": "Мне не известна эта команда...\nДля просмотра команд "
-                                                       "напишите /команды",
-                                            "random_id": notrandom()})
+                elif command == "курс":
+                    value = course()
+                    answer = "1 $ = " + str(value['USD']) + " ₽\n"
+                    answer += "1 $ = " + str(value['EUR']) + " €\n"
+                    answer += "1 $ = " + str(value['UAH']) + " ₴\n"
+                    vk.method("messages.send", {"peer_id": id, "message": answer, "random_id": notrandom()})
 
-        if body.lower() == "f":
-            photo(id, 15, notrandom())
+                else:
+                    count -= 1
+                    lost += 1
+                    vk.method("messages.send", {"peer_id": id,
+                                                "message": "Мне не известна эта команда...\nДля просмотра команд "
+                                                           "напишите /команды",
+                                                "random_id": notrandom()})
 
-        if d > 0:
-            photo(id, d, notrandom())
-            d = 0
+            if body.lower() == "f":
+                photo(id, 15, notrandom())
 
+            if d > 0:
+                photo(id, d, notrandom())
+                d = 0
+                
+    except Exception as e:
+        time.sleep(150)
+        print(str(e))
