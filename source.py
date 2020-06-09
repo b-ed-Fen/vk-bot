@@ -80,7 +80,7 @@ def group_check(id):
 
 
 # Основной цикл
-while True:
+for event in longpoll.listen():
     try:
         start_time = time.time()
         messages = vk.method("messages.getConversations", {"offset": 0, "count": 20, "filter": "unanswered"})
@@ -180,6 +180,6 @@ while True:
             if d > 0:
                 photo(id, d, notrandom())
                 d = 0
-                
+
     except Exception as e:
         print(str(e))
