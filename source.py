@@ -68,6 +68,7 @@ def course():
 
 
 def group_check(id):
+    """
     temp = ''
     for i in second_group:
         if i != ',':
@@ -76,6 +77,7 @@ def group_check(id):
             if int(temp) == id:
                 return True
             temp = ''
+    """
     return False
 
 
