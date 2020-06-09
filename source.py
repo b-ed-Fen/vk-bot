@@ -182,5 +182,4 @@ while True:
                 d = 0
                 
     except Exception as e:
-        time.sleep(150)
         print(str(e))
