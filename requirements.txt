@@ -1,3 +1,3 @@
-requests==2.22.0
+requests==2.31.0
 vk-api==11.6.1
 pycbrf == 0.4.0
